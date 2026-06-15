@@ -14,7 +14,7 @@ Install via [skillship](https://github.com/shivdeepak/skillship) (requires
 Node.js >= 18):
 
 ```bash
-npx skillship install shivdeepak/knowledge-base-builder -a cursor -a claude-code
+npx skillship@latest install shivdeepak/knowledge-base-builder -a cursor -a claude-code
 ```
 
 Or install directly with the `skills` CLI:
