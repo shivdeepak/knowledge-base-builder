@@ -1,0 +1,11 @@
+---
+description: knowledge-base-builder skill guidance
+alwaysApply: false
+---
+
+# knowledge-base-builder
+
+This rule points the agent at the `knowledge-base-builder` Agent Skill.
+
+Read `knowledge-base-builder/SKILL.md` and follow its instructions when the task
+matches the skill's description.
