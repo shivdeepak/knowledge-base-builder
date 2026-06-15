@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/shivdeepak/knowledge-base-builder/compare/v1.1.0...v1.1.1) (2026-06-15)
+
+
+### Documentation
+
+* use repeated -a flags in skillship install command ([9d1c76f](https://github.com/shivdeepak/knowledge-base-builder/commit/9d1c76f206eab05c860468edb4a6dfe10ec2f711))
+* use skillship@latest in install command ([7251e42](https://github.com/shivdeepak/knowledge-base-builder/commit/7251e42df000b144f3f404e687404746f80a98d8))
+
 ## [1.1.0](https://github.com/shivdeepak/knowledge-base-builder/compare/v1.0.0...v1.1.0) (2026-06-15)
 
 

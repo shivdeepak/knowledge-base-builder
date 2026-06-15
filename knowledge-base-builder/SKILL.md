@@ -6,7 +6,7 @@ description: >-
   second brain, knowledge base.
 license: MIT
 metadata:
-  version: "1.1.0" # x-release-please-version
+  version: "1.1.1" # x-release-please-version
 ---
 
 # Knowledge Base Builder
