@@ -18,6 +18,11 @@ Usage:
     python build_index.py [ROOT] --check      # exit 1 if any index is stale; write nothing
     python build_index.py [ROOT] --report     # also print which files are missing summaries
 
+Exit codes: 0 = success; 1 = stale indexes (--check only); 2 = bad ROOT or I/O errors.
+
+Requires Python 3.8+. PyYAML is optional: without it, a built-in minimal parser handles
+flat single-line frontmatter but may misread folded/multi-line YAML (a warning is printed).
+
 A directory's own summary (used by its parent's index) is read from the `summary` field
 in the frontmatter of that directory's index.md. So to describe an "area", write a
 summary in the frontmatter of that area's index.md.
@@ -30,6 +35,13 @@ import sys
 from pathlib import Path
 from urllib.parse import quote
 
+if sys.version_info < (3, 8):
+    sys.exit(
+        f"build_index.py needs Python 3.8+, but is running on "
+        f"{sys.version_info.major}.{sys.version_info.minor}. "
+        f"Re-run with a newer interpreter, e.g. `python3 build_index.py`."
+    )
+
 BEGIN = "<!-- BEGIN AUTO-INDEX (managed by build_index.py — edits inside are overwritten) -->"
 END = "<!-- END AUTO-INDEX -->"
 
@@ -41,11 +53,24 @@ NOTE_EXTS = {".md", ".markdown"}
 SKIP_FILES = {"index.md", ".DS_Store"}
 
 
+_warned_no_yaml = False
+
+
 def try_yaml():
+    """Return the PyYAML module, or None (warning once) if it isn't installed."""
+    global _warned_no_yaml
     try:
         import yaml  # type: ignore
         return yaml
     except Exception:
+        if not _warned_no_yaml:
+            _warned_no_yaml = True
+            print(
+                "warning: PyYAML not found; using the minimal frontmatter parser. "
+                "Folded/multi-line YAML (e.g. `summary: >-`) may be misread. "
+                "Install it with `pip install pyyaml` for full parsing.",
+                file=sys.stderr,
+            )
         return None
 
 
@@ -120,7 +145,10 @@ def first_heading_or_line(text: str) -> str:
 
 def note_descriptor(md: Path) -> tuple[str, str, str, bool]:
     """Return (title, summary, status, has_summary) for a note file."""
-    text = md.read_text(encoding="utf-8", errors="replace")
+    try:
+        text = md.read_text(encoding="utf-8", errors="replace")
+    except OSError as e:
+        return md.stem, f"_(unreadable: {e.strerror or e})_", "", True
     fm = parse_frontmatter(text)
     title = str(fm.get("title") or md.stem)
     status = str(fm.get("status") or "")
@@ -135,7 +163,11 @@ def dir_summary(directory: Path) -> str:
     idx = directory / "index.md"
     if not idx.exists():
         return ""
-    fm = parse_frontmatter(idx.read_text(encoding="utf-8", errors="replace"))
+    try:
+        text = idx.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    fm = parse_frontmatter(text)
     return str(fm.get("summary") or "")
 
 
@@ -245,26 +277,39 @@ def main() -> int:
 
     stale: list[Path] = []
     all_missing: list[Path] = []
+    errors: list[str] = []
     written = 0
 
     for directory in walk(root):
-        block, missing = build_block(directory)
-        all_missing.extend(missing)
         idx = directory / "index.md"
-        existing = idx.read_text(encoding="utf-8", errors="replace") if idx.exists() else None
-        new_content = render_index(directory, block, existing)
+        try:
+            block, missing = build_block(directory)
+            all_missing.extend(missing)
+            existing = idx.read_text(encoding="utf-8", errors="replace") if idx.exists() else None
+            new_content = render_index(directory, block, existing)
+        except OSError as e:
+            errors.append(f"{idx.relative_to(root)}: {e}")
+            continue
 
         if existing != new_content:
             if args.check:
                 stale.append(idx)
             else:
-                idx.write_text(new_content, encoding="utf-8")
-                written += 1
+                try:
+                    idx.write_text(new_content, encoding="utf-8")
+                    written += 1
+                except OSError as e:
+                    errors.append(f"{idx.relative_to(root)}: {e}")
 
     if args.report and all_missing:
         print("Notes missing a `summary` (have the LLM write one into frontmatter):")
         for n in all_missing:
             print(f"  - {n.relative_to(root)}")
+
+    if errors:
+        print("error: could not process some paths:", file=sys.stderr)
+        for e in errors:
+            print(f"  - {e}", file=sys.stderr)
 
     if args.check:
         if stale:
@@ -272,13 +317,15 @@ def main() -> int:
             for s in stale:
                 print(f"  - {s.relative_to(root)}")
             return 1
+        if errors:
+            return 2
         print("All indexes up to date.")
         return 0
 
     print(f"Rebuilt {written} index.md file(s) under {root}.")
     if all_missing:
         print(f"{len(all_missing)} note(s) still need a summary — run with --report to list them.")
-    return 0
+    return 2 if errors else 0
 
 
 if __name__ == "__main__":
