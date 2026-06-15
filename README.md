@@ -8,6 +8,22 @@ disclosure** instead of embeddings or a vector database.
 Packaged with [skillship](https://github.com/shivdeepak/skillship) for
 cross-surface distribution.
 
+## Installation
+
+Install via [skillship](https://github.com/shivdeepak/skillship) (requires
+Node.js >= 18):
+
+```bash
+npx skillship install knowledge-base-builder -a cursor,claude-code
+```
+
+Or install directly with the `skills` CLI:
+
+```bash
+npx skills add shivdeepak/knowledge-base-builder
+```
+
+
 ## The idea
 
 Every directory gets a lightweight `index.md`; every note gets a one-line
@@ -124,25 +140,3 @@ about which files to open.
 It is **not** for very large, high-churn corpora (millions of chunks, constant
 ingestion, fuzzy semantic recall across everything at once). Those want vector
 search or GraphRAG.
-
-## Installation
-
-Install via [skillship](https://github.com/shivdeepak/skillship) (requires
-Node.js >= 18):
-
-```bash
-npx skillship install knowledge-base-builder -a cursor,claude-code
-```
-
-Or install directly with the `skills` CLI:
-
-```bash
-npx skills add shivdeepak/knowledge-base-builder
-```
-
-### Validate and package
-
-```bash
-npx skillship validate knowledge-base-builder --profile all
-npx skillship package knowledge-base-builder   # -> dist/knowledge-base-builder.skill
-```
