@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 BEGIN = "<!-- BEGIN AUTO-INDEX (managed by build_index.py — edits inside are overwritten) -->"
 END = "<!-- END AUTO-INDEX -->"
@@ -52,7 +53,9 @@ def parse_frontmatter(text: str) -> dict:
     """Return the YAML frontmatter as a dict, or {} if none.
 
     Uses PyYAML when available; otherwise falls back to a minimal parser that handles the
-    flat keys this knowledge base relies on (title, summary, status, tags).
+    flat keys this knowledge base relies on (title, summary, status, tags). The fallback
+    only understands single-line scalars and simple lists — not folded/multi-line YAML
+    (e.g. `summary: >-`), so install PyYAML if your notes use those.
     """
     if not text.startswith("---"):
         return {}
@@ -87,8 +90,15 @@ def parse_frontmatter(text: str) -> dict:
         elif value.startswith("[") and value.endswith("]"):
             data[key] = [v.strip() for v in value[1:-1].split(",") if v.strip()]
         else:
-            data[key] = value.strip().strip("\"'")
+            data[key] = _unquote(value.strip())
     return data
+
+
+def _unquote(value: str) -> str:
+    """Strip a single matched pair of surrounding quotes, leaving lone quotes intact."""
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        return value[1:-1]
+    return value
 
 
 def first_heading_or_line(text: str) -> str:
@@ -159,7 +169,8 @@ def build_block(directory: Path) -> tuple[str, list[Path]]:
         for d in subdirs:
             s = dir_summary(d)
             tail = f" — {s}" if s else " — _(no area summary yet)_"
-            lines.append(f"- [`{d.name}/`]({d.name}/index.md){tail}")
+            href = f"{quote(d.name)}/index.md"
+            lines.append(f"- [`{d.name}/`]({href}){tail}")
         lines.append("")
 
     if notes:
@@ -171,14 +182,14 @@ def build_block(directory: Path) -> tuple[str, list[Path]]:
                 missing.append(n)
             badge = f" _({status})_" if status else ""
             desc = summary if summary else "_(no summary yet)_"
-            lines.append(f"- [{title}]({n.name}){badge} — {desc}")
+            lines.append(f"- [{title}]({quote(n.name)}){badge} — {desc}")
         lines.append("")
 
     if others:
         lines.append("### Files")
         lines.append("")
         for f in others:
-            lines.append(f"- [`{f.name}`]({f.name})")
+            lines.append(f"- [`{f.name}`]({quote(f.name)})")
         lines.append("")
 
     if not (subdirs or notes or others):

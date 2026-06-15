@@ -50,8 +50,8 @@ forcing this pattern.
 
 ### 1. Assess the directory
 
-Before changing anything, look. List the tree (`view` the directory, or
-`find <dir> -type f`). Sample a handful of files to learn the content and whether they
+Before changing anything, look. List the tree (e.g. `find <dir> -type f`). Sample a
+handful of files to learn the content and whether they
 already have frontmatter. Note what exists: Is there structure or is it a flat dump? Do
 notes have summaries? Are there already index.md files (this may be a refresh, not a
 first build)? Are there non-markdown files (PDFs, images) to account for?
@@ -88,7 +88,7 @@ the parent index can describe the area in one line.
 
 ### 4. Build the indexes
 
-Run the bundled script to assemble every index.md from the frontmatter you just wrote:
+Copy the bundled script into the knowledge base itself — `<knowledge-base-root>/scripts/build_index.py` — so the base is self-contained: the maintenance loop, the navigation protocol, and any pre-commit hook all resolve to a script that lives alongside the notes, even for a session that has never seen this skill. Then run it to assemble every index.md from the frontmatter you just wrote:
 
 ```bash
 python scripts/build_index.py <knowledge-base-root>
@@ -118,6 +118,7 @@ sync with the notes.
 ## Output
 
 A directory where every folder has an index.md, every note has a frontmatter summary, the
-root carries a navigation protocol, and `scripts/build_index.py` (copied into the base,
-or referenced) keeps it all in sync. The result is browsable by a person and navigable by
-any LLM, with the structure visible and editable as plain text.
+root carries a navigation protocol, and a copy of `scripts/build_index.py` lives in the
+base (at `<root>/scripts/build_index.py`) to keep it all in sync. The result is browsable
+by a person and navigable by any LLM, with the structure visible and editable as plain
+text.

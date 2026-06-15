@@ -102,7 +102,13 @@ Each `index.md` has two parts:
 ```
 
 Never hand-edit inside the markers — your changes will be overwritten next rebuild.
-Put durable content above or below them.
+Put durable content above or below them. Don't alter the marker comment text itself
+either: the script matches the exact `BEGIN`/`END` strings, so a changed marker makes it
+append a second block instead of replacing the existing one.
+
+Every directory gets an `index.md`, including empty ones (their auto-index region just
+reads `_(empty)_`). Because of this, `--check` reports any directory still lacking an
+`index.md` as stale until you run a build.
 
 ## Root navigation protocol
 
