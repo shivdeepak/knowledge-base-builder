@@ -22,7 +22,7 @@ jobs:
           node-version: "24"
       - name: Package skill
         if: ${{ steps.release.outputs.release_created }}
-        run: npx skillship package knowledge-base-builder
+        run: npx skillship@latest package knowledge-base-builder
       - name: Upload to release
         if: ${{ steps.release.outputs.release_created }}
         env:

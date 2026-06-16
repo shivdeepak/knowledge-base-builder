@@ -11,4 +11,4 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: "24"
-      - run: npx skillship validate knowledge-base-builder --profile all
+      - run: npx skillship@latest validate knowledge-base-builder --profile all

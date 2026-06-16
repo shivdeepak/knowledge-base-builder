@@ -25,6 +25,6 @@ across Cursor, Claude Code, Claude Web, and Claude Cowork.
 
 ## Commands
 
-- `npx skillship validate knowledge-base-builder --profile all`
-- `npx skillship package knowledge-base-builder`
-- `npx skillship install knowledge-base-builder -a cursor,claude-code`
+- `npx skillship@latest validate knowledge-base-builder --profile all`
+- `npx skillship@latest package knowledge-base-builder`
+- `npx skillship@latest install knowledge-base-builder -a cursor,claude-code`
