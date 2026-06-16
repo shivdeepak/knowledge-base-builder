@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/shivdeepak/knowledge-base-builder/compare/v1.2.0...v1.2.1) (2026-06-16)
+
+
+### Documentation
+
+* refine README and SKILL.md for clarity on knowledge base structure ([fb2be30](https://github.com/shivdeepak/knowledge-base-builder/commit/fb2be3066726642a48d34f8abbbf4bcaf2b734e1))
+
 ## [1.2.0](https://github.com/shivdeepak/knowledge-base-builder/compare/v1.1.1...v1.2.0) (2026-06-16)
 
 
