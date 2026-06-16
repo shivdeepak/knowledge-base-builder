@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/shivdeepak/knowledge-base-builder/compare/v1.1.1...v1.2.0) (2026-06-16)
+
+
+### Features
+
+* add knowledge-base-builder skill and supporting files ([191a1a5](https://github.com/shivdeepak/knowledge-base-builder/commit/191a1a50b3caa89f1c9d2ce4000d5d25a5e03b59))
+
+
+### Documentation
+
+* update skillship commands to use latest version ([6775d36](https://github.com/shivdeepak/knowledge-base-builder/commit/6775d36f2c07793dcd6938de72fe170b2db65ba8))
+
 ## [1.1.1](https://github.com/shivdeepak/knowledge-base-builder/compare/v1.1.0...v1.1.1) (2026-06-15)
 
 
