@@ -27,12 +27,12 @@ friendly, and needs no database. The filesystem is the state; Markdown is the
 wire
 format.
 
-The work splits cleanly. Writing each note's **summary** requires reading and
-understanding the file — that is your job as the model. Assembling those
-summaries into
-**index.md** files is mechanical and repetitive — that is the bundled script's
-job. Keep
-that division: you supply meaning, the script supplies structure.
+The work has two parts. Writing each note's **summary** requires reading and
+understanding the file — that is the judgment-heavy part. Assembling those
+summaries into **index.md** files is mechanical and repetitive, but you do it
+too: walk the tree and, in each directory, write an index listing its sub-areas
+and notes with their summaries. You supply the meaning, and you keep the
+structure in sync. No scripts, no database — just you and Markdown.
 
 Read `references/conventions.md` for the exact frontmatter schema, index.md
 format,
@@ -114,56 +114,39 @@ the parent index can describe the area in one line.
 
 ### 4. Build the indexes
 
-Copy the bundled script into the knowledge base itself —
-`<knowledge-base-root>/scripts/build_index.py` — so the base is self-contained:
-the maintenance loop, the navigation protocol, and any pre-commit hook all
-resolve to a script that lives alongside the notes, even for a session that has
-never seen this skill. Then run it to assemble every index.md from the
-frontmatter you just wrote:
+Now assemble the summaries into index.md files. In each directory, write a
+plain, readable index.md that introduces the area in a line or two and lists its
+sub-areas and notes, each with its one-line summary — see the example in
+`references/conventions.md`. Work bottom-up: a directory describes itself through
+the `summary` in its own index.md frontmatter, and its parent's index reads that,
+so write a child's index before the parent that links to it.
 
-```bash
-python scripts/build_index.py <knowledge-base-root>
-```
-
-It walks the tree and, in each directory, writes an index.md listing sub-areas
-and notes
-with their summaries. It only owns the region between the AUTO-INDEX markers —
-anything
-you write outside them is preserved. Use `--report` to list notes still missing
-a
-summary so you can circle back, and `--check` (writes nothing, exits non-zero on
-stale
-indexes) for a git pre-commit hook or CI.
+Write these as documents a person would happily read, not machine output — no
+generated-region markers or fenced-off blocks. As you go, keep a list of notes
+still missing a `summary` and circle back to write them; an index entry with no
+summary is dead weight.
 
 ### 5. Make the base self-describing
 
-Write the navigation protocol into the root index.md, above the auto-index block
-(see
-the template in `references/conventions.md`). This tells any future session how
-to
-traverse the base — read index, scan summaries, open the few relevant files — so
-the
+Open the root index.md with a short navigation protocol (see the template in
+`references/conventions.md`). This tells any future session how to traverse the
+base — read index, scan summaries, open the few relevant files — so the
 knowledge base works for a cold agent that has never seen it, not just for this
 conversation.
 
 ### 6. Hand off maintenance
 
 Leave the user with the simple upkeep loop: when you add or edit notes, refresh
-the
-`summary` in the frontmatter, then re-run `build_index.py` to rebuild the
-indexes.
-Offer to wire the `--check` mode into a git pre-commit hook so indexes never
-drift out of
-sync with the notes.
+the `summary` in the frontmatter, then update the index.md in that note's
+directory (and any parent whose area summary changed). Because the base is plain
+Markdown with a navigation protocol baked into the root index, any future agent —
+even one that has never seen this skill — can refresh stale indexes on demand by
+following the same conventions.
 
 ## Output
 
 A directory where every folder has an index.md, every note has a frontmatter
-summary, the
-root carries a navigation protocol, and a copy of `scripts/build_index.py` lives
-in the
-base (at `<root>/scripts/build_index.py`) to keep it all in sync. The result is
-browsable
-by a person and navigable by any LLM, with the structure visible and editable as
-plain
-text.
+summary, and the root carries a navigation protocol that teaches any future
+session how to traverse and maintain the base. The result is browsable by a
+person and navigable by any LLM, with the structure visible and editable as
+plain text — no scripts or database to keep in sync.

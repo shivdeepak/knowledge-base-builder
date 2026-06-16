@@ -69,51 +69,58 @@ A directory describes itself through the `summary` in the frontmatter of its own
 summary: Active and archived project plans, one file per project.
 ---
 
-# projects — index
+# projects
 
-<!-- BEGIN AUTO-INDEX ... -->
-...
-<!-- END AUTO-INDEX -->
+...intro and listing...
 ```
 
 ## index.md anatomy
 
-Each `index.md` has two parts:
-
-1. **A human region** — anything you write outside the auto-index markers is preserved
-   across rebuilds: a title, an intro paragraph, the navigation protocol (root only),
-   hand-picked "start here" links.
-2. **An auto-generated region** — everything between the markers is owned by
-   `build_index.py` and rewritten on every run:
+An `index.md` is just a readable Markdown page for one directory — a short intro
+and a list of what's inside, grouped so a person (or agent) can scan it. There
+are no special markers or generated blocks; you write and update the whole file
+by hand, the same way you'd keep a good README current.
 
 ```markdown
-<!-- BEGIN AUTO-INDEX (managed by build_index.py — edits inside are overwritten) -->
+---
+summary: Active and archived project plans, one file per project.
+---
 
-### Areas
-- [`projects/`](projects/index.md) — Active and archived project plans.
+# projects
 
-### Notes
-- [On focus](on-focus.md) _(active)_ — Why I lose focus mid-week and what I'm trying.
+Plans and decision logs, one file per project. Start with the roadmap.
 
-### Files
+## Areas
+- [`archive/`](archive/index.md) — Completed projects kept for reference.
+
+## Notes
+- [Q3 roadmap](q3-roadmap.md) _(active)_ — The three shipping milestones, owners, and risks.
+- [On focus](on-focus.md) — Why I lose focus mid-week and what I'm trying.
+
+## Files
 - [`diagram.png`](diagram.png)
-
-<!-- END AUTO-INDEX -->
 ```
 
-Never hand-edit inside the markers — your changes will be overwritten next rebuild.
-Put durable content above or below them. Don't alter the marker comment text itself
-either: the script matches the exact `BEGIN`/`END` strings, so a changed marker makes it
-append a second block instead of replacing the existing one.
+What goes in each group:
 
-Every directory gets an `index.md`, including empty ones (their auto-index region just
-reads `_(empty)_`). Because of this, `--check` reports any directory still lacking an
-`index.md` as stale until you run a build.
+- **Areas** — one bullet per sub-directory, linking to its `index.md`, with the
+  `summary` from that sub-directory's index.md frontmatter as the one-liner.
+- **Notes** — one bullet per `.md`/`.markdown` file (excluding `index.md`),
+  linking to the file, showing its `title` (or filename stem), an optional
+  `_(status)_` badge, and its `summary`.
+- **Files** — one bullet per non-note file (PDFs, images, etc.).
+
+Keep the listing in sync with the directory: when a note's summary or a
+sub-area's summary changes, update the matching line. Drop a group heading
+entirely if it has no entries, and skip dotfiles and infrastructure dirs
+(`.git`, `.obsidian`, `node_modules`, `__pycache__`). Every directory gets an
+`index.md`, including empty ones (which can simply say the area is empty for
+now).
 
 ## Root navigation protocol
 
-The root `index.md` should carry a short protocol, above the auto-index block, that
-tells any future agent (or person) how to use the knowledge base. This makes the base
+The root `index.md` opens with a short protocol, before the listing, that tells
+any future agent (or person) how to use the knowledge base. This makes the base
 self-describing: drop a fresh session in front of it and it knows how to navigate.
 Use this template:
 
@@ -127,11 +134,11 @@ How to use this knowledge base (progressive disclosure):
 4. If nothing fits, say so rather than guessing — the base may not cover it yet.
 
 When you add or change notes, write/refresh the `summary` in each note's frontmatter,
-then run `python scripts/build_index.py` to rebuild every index.
+then update the affected directory's index.md (and any parent whose area summary
+changed) to match.
 
-<!-- BEGIN AUTO-INDEX ... -->
-...
-<!-- END AUTO-INDEX -->
+## Areas
+...listing...
 ```
 
 ## Naming
@@ -142,10 +149,10 @@ then run `python scripts/build_index.py` to rebuild every index.
 - Keep the tree shallow. Two or three levels handles thousands of notes; deeper nesting
   hurts navigability more than it helps.
 
-## What the script does and doesn't do
+## What index-building does and doesn't touch
 
-- **Does:** assemble `index.md` in every directory from existing frontmatter; preserve
-  human regions; flag notes missing a summary (`--report`); check for staleness
-  (`--check`, useful in a git pre-commit hook or CI).
-- **Doesn't:** write summaries, move or rename files, delete anything. Those need
-  judgment (and the user's consent), so they stay with the LLM.
+- **Does:** keep each directory's `index.md` listing in sync with its contents
+  and the notes' frontmatter summaries.
+- **Doesn't:** write summaries, move or rename files, or delete anything. Those
+  need judgment (and the user's consent), so handle them as deliberate, separate
+  steps rather than folding them into an index update.
