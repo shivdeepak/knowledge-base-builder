@@ -1,0 +1,7 @@
+{
+  "name": "knowledge-base-builder",
+  "description": "Turns a folder of notes, docs, or plans into an LLM-navigable knowledge base using index.md files and per-note summaries. No vector DB.",
+  "author": {
+    "name": "Shiv Deepak"
+  }
+}
